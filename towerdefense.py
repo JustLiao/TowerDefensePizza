@@ -42,17 +42,16 @@ class VampireSprite(sprite.Sprite):
         y = 50 + self.lane * 100
         self.rect = self.image.get_rect(center = (1100, y))
     def update(self, game_window):
-        game_window.blit(self.image, (self.rect.x, self.rect.y))
+        game_window.blit(background, (self.rect.x, self.rect.y), self.rect)
         self.rect.x -= self.speed
         game_window.blit(self.image, (self.rect.x, self.rect.y))
 
 class BackgroundTile(sprite.Sprite):
    def  __init__(self, rect):
-       super(self.effect)
-       super().__init__()
-       self.effect = False
-
-all_vampires = sprite.Group()
+        super().__init__()
+        self.effect = False
+        self.rect = rect
+        all_vampires = sprite.Group()
 
 tile_color = WHITE
 
@@ -62,9 +61,6 @@ for row in range(6):
         y = 50 + self.lane * 100
         self.rect = self.image.get_rect(center=(1100, y))
             
-GAME_WINDOW.blit(VAMPIRE_PIZZA, (0, 0))
-GAME_WINDOW.blit(BACKGROUND, (0, 0))    
-
 game_running = True
 while game_running:
     for event in pygame.event.get():
@@ -75,7 +71,7 @@ while game_running:
         VampireSprite()
 
     for vampire in all_vampires:
-        vampire .update(GAME_WINDOW)
+        vampire.update(GAME_WINDOW)
 
     display.update()
     clock.tick(FRAME_RATE)
