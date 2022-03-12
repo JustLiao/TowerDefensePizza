@@ -6,8 +6,8 @@ pygame.init()
 
 clock = time.Clock()
 
-WINDOW_WIDTH = 900
-WINDOW_HEIGHT = 400
+WINDOW_WIDTH = 1100
+WINDOW_HEIGHT = 600
 
 
 WINDOW_RES = (WINDOW_WIDTH, WINDOW_HEIGHT)
@@ -41,8 +41,10 @@ class VampireSprite(sprite.Sprite):
         self.image = VAMPIRE_PIZZA.copy()
         y = 50 + self.lane * 100
         self.rect = self.image.get_rect(center = (1100, y))
-        def update(self, game_window):
-            game_window.blit(self.image, (self.rect.x, self.rect.y))
+    def update(self, game_window):
+        game_window.blit(self.image, (self.rect.x, self.rect.y))
+        self.rect.x -= self.speed
+        game_window.blit(self.image, (self.rect.x, self.rect.y))
 
 class BackgroundTile(sprite.Sprite):
    def  __init__(self, rect):
@@ -57,18 +59,11 @@ tile_color = WHITE
 for row in range(6):
     for column in range(11):
         draw.rect(BACKGROUND, tile_color, (WIDTH * column, HEIGHT * row, WIDTH, HEIGHT),1)
-
-GAME_WINDOW.blit(VAMPIRE_PIZZA, (0, 0))
-GAME_WINDOW.blit(BACKGROUND, (0, 0))
-
         y = 50 + self.lane * 100
         self.rect = self.image.get_rect(center=(1100, y))
-    def update(self,game_window):
-        game_window.blit(BACKGROUND, (self.rect.x, self.rect.y), self.rect)
-        self.rect.x -= self.speed
-
-        game_window.blit(self.image, (self.rect.x, self.rect.y))
-    
+            
+GAME_WINDOW.blit(VAMPIRE_PIZZA, (0, 0))
+GAME_WINDOW.blit(BACKGROUND, (0, 0))    
 
 game_running = True
 while game_running:
