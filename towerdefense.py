@@ -54,21 +54,41 @@ class BackgroundTile(sprite.Sprite):
         self.rect = rect
 
 all_vampires = sprite.Group()
-        
 
+tile_grid = []
 tile_color = WHITE
+for row in range(6):
+    
+    row_of_tiles = []
+    tile_grid.append(row_of_tiles)
+    for column in range(11):
+        tile_rect = Rect(WIDTH * column, HEIGHT * row, WIDTH, HEIGHT)
+        new_tile = BackgroundTile(tile_rect)
+        row_of_tiles.append(new_tile)
+
+
+
 
 for row in range(6):
     for column in range(11):
         draw.rect(BACKGROUND, tile_color, (WIDTH * column, HEIGHT * row, WIDTH, HEIGHT),1)
       
-#GAME_WINDOW.blit(BACKGROUND, (0,0,0))
+GAME_WINDOW.blit(BACKGROUND, (0,0))
 game_running = True
 
 while game_running:
     for event in pygame.event.get():
         if event.type == QUIT:
             game_running = False
+
+        elif event.type == MOUSEBUTTONDOWN:
+            coordinates = mouse.get_pos()
+            x = coordinates[0]
+            y = coordinates[1]
+
+            tile_y = y // 100
+            tile_x = x // 100
+            tile_grid[tile_y][tile_x].effect = True
 
     if randint(1, SPAWN_RATE) == 1:
         VampireSprite()
