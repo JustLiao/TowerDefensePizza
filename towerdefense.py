@@ -108,12 +108,15 @@ while game_running:
     for vampire in all_vampires:
         tile_row = tile_grid[vampire.rect.y // 100]
         vamp_left_side = vampire.rect.x // 100
-        vamp_right_side = (vampire.rect.x + vampire.recft.width) // 100
+        vamp_right_side = (vampire.rect.x + vampire.rect.width) // 100
         if 0 <= vamp_left_side <= 10:
             left_tile = tile_row[vamp_left_side]
         else:
             left_tile = None
-
+        if 0 <= vamp_right_side <= 10:
+            right_tile = tile_row[vamp_right_side]
+        else:
+            right_tile = None
         if bool(left_tile) and left_tile.effect:
             vampire.speed = SLOW_SPEED
         if bool(right_tile) and right_tile.effect:
