@@ -42,6 +42,20 @@ pizza_img = image.load('vampire.png')
 pizza_surf =  Surface.convert_alpha(pizza_img)
 VAMPIRE_PIZZA = transform.scale(pizza_surf, (WIDTH, HEIGHT))
 
+garlic_img = image.load('vampire.png')
+garlic_surf =  Surface.convert_alpha(garlic_img)
+GARLIC = transform.scale(garlic_surf, (WIDTH, HEIGHT))
+
+cutter_img = image.load('pizzacutter.png')
+cutter_surf = Surface.convert_alpha(cutter_img)
+CUTTER = transform.scale(cutter_surf, (WIDTH, HEIGHT))
+
+pepperoni_img = image.load('pepperoni.png')
+pepperoni_surf = Surface.convert_alpha(pepperoni_img)
+PEPPERONI = transform.scale(pepperoni_surf, (WIDTH, HEIGHT))
+
+
+
 class VampireSprite(sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -81,15 +95,50 @@ class Counters(object):
             self.increment_bucks()
             self.draw_bucks(game_window)
 
+class Trap(object):
+    def __init__(self,trap_kind, cost, trap_img):
+        self.trap_kind = trap_kind
+        self.cost = cost
+        self.trap_img = trap_img
+        
+class TrapApplicator(object):
+    def __init__(self):
+        self.selected = None
+        def select_trap(self, trap):
+            if trap.cost <= counters.pizza_bucks:
+                selected = trap
+        def select_tile(self, tile, counters):
+            self.selected = tile.set_trap(self.selected, counters)
+
+
 class BackgroundTile(sprite.Sprite):
    def  __init__(self, rect):
         super().__init__()
-        self.effect = False
+        self.trap = None
         self.rect = rect
 
-all_vampires = sprite.Group()
+class PlayTile(BackgroundTile):
+    def set_trap(self, trap, counters):
+        if bool(trap) and not bool(self.trap):
+            counters.pizza_bucks -= trap.cost
+            self.trap = trap
+            if trap == EARN:
+                counters.buck_booster += 1
+            return None
+    def draw_trap(self, game_window, trap_applicator):
+        if bool(self.trap):
+            game_window.blit(self.trap.trap_img, (self.rect.x, self.rect.y))
 
+all_vampires = sprite.Group()
 counters = Counters(STARTING_BUCKS, BUCK_RATE, STARTING_BUCK_BOOSTER)
+
+SLOW = Trap('SLOW', 5, GARLIC)
+DAMAGE = Trap('Damage', 3, CUTTER)
+EARN = Trap('Earn', 7, PEPPERONI)
+
+trap_applicator = TrapApplicator()
+
+
 
 tile_grid = []
 tile_color = WHITE
@@ -124,7 +173,7 @@ while game_running:
 
             tile_y = y // 100
             tile_x = x // 100
-            tile_grid[tile_y][tile_x].effect = True
+            trap_applicator.select_tile(tile_grid[tile_y[[tile_x], counters]])
 
     if randint(1, SPAWN_RATE) == 1:
         VampireSprite()
