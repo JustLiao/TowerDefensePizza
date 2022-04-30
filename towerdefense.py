@@ -13,6 +13,9 @@ STARTING_BUCKS = 15
 BUCK_RATE = 120
 STARTING_BUCK_BOOSTER = 1
 
+MAX_BAD_REVIEWS = 3
+WIN_TIME = FRAME_RATE * 60 * 3
+
 REG_SPEED = 2
 SLOW_SPEED = 1
 
@@ -66,18 +69,32 @@ class VampireSprite(sprite.Sprite):
         y = 50 + self.lane * 100
         self.rect = self.image.get_rect(center = (1100, y))
         
-    def update(self, game_window):
+    def update(self, game_window, counters):
         game_window.blit(BACKGROUND, (self.rect.x, self.rect.y), self.rect)
         self.rect.x -= self.speed
-        game_window.blit(self.image, (self.rect.x, self.rect.y))
+        if self.health <= 0 or self.rect.x <= 100:
+            self.kill()
+            if self.rect.x <= 100:
+                counters.bad_reviews += 1
+        else:    
+            game_window.blit(self.image, (self.rect.x, self.rect.y))
+    def attack(self,tile):
+        if tile.trap == SLOW:
+            self.speed = SLOW_SPEED
+        if tile.trap == DAMAGE:
+            self.health -= 1
 class Counters(object):
-    def __init__(self, pizza_bucks, buck_rate, buck_booster):
+    def __init__(self, pizza_bucks, buck_rate, buck_booster, timer):
         self.loop_count = 0
         self.display_font = font.Font('pizza_font.ttf', 25)
         self.pizza_bucks = pizza_bucks
         self.buck_rate = buck_rate
         self.buck_booster = buck_booster
         self.bucks_rect = None
+        self.timer = timer
+        self.timer_rect = None
+        self.bad_reviews = 0
+        self.bad_rev_rect = None
     def increment_bucks(self):
         if self.loop_count % self.buck_rate == 0:
             self.pizza_bucks += self.buck_booster
@@ -89,11 +106,30 @@ class Counters(object):
         self.bucks_rect.x = WINDOW_WIDTH - 50
         self.bucks_rect.y = WINDOW_HEIGHT - 50
         game_window.blit(bucks_surf, self.bucks_rect)
+    def draw_bad_reviews(self, game_window):
+        if bool(self.bad_rev_rect):
+            game_window.blit(BACKGROUND, (self.bad_rev_rect.x, self.bad_rev_rect.y), self.bad_rev_rect)
+            bad_rev_surf = self.display_font.render(str(self.bad_reviews), True, WHITE)
+            self.bad_rev_rect = bad_rev_surf.get_rect()
+            self.bad_rev_rect.x = WINDOW_WIDTH - 150
+            self.bad_rev_rect.y = WINDOW_HEIGHT - 50
+            game_window.blit(bad_rev_sruf, self.bad_rev_rect)
+
+    def draw_timer (self, game_window):
+        if bool(self.timer_rect):
+                game_window.blit(BACKGROUND, (self.timer_rect.x, self.timer_rect.y), self.timer_rect)
+            timer_surf = self.display_font.render(str((WIN_TIME - self.loop_count) // FRAME_RATE), True, WHITE)
+            self.timer_rect = timer_surf.get_rect()
+            self.timer_rect.x = WINDOW_WIDTH - 250
+            self.timer_rect.y = WINDOW_HEIGHT - 50
+            game_window.blit(timer_surf, self.timer_rect)
             
-        def update(self, game_window):
-            self.loop_count += 1
-            self.increment_bucks()
-            self.draw_bucks(game_window)
+    def update(self, game_window):
+        self.loop_count += 1
+        self.increment_bucks()
+        self.draw_bucks(game_window)
+
+
 
 class Trap(object):
     def __init__(self,trap_kind, cost, trap_img):
