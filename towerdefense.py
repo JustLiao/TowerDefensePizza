@@ -117,13 +117,13 @@ class Counters(object):
 
     def draw_timer (self, game_window):
         if bool(self.timer_rect):
-                game_window.blit(BACKGROUND, (self.timer_rect.x, self.timer_rect.y), self.timer_rect)
-            timer_surf = self.display_font.render(str((WIN_TIME - self.loop_count) // FRAME_RATE), True, WHITE)
-            self.timer_rect = timer_surf.get_rect()
-            self.timer_rect.x = WINDOW_WIDTH - 250
-            self.timer_rect.y = WINDOW_HEIGHT - 50
-            game_window.blit(timer_surf, self.timer_rect)
-            
+            game_window.blit(BACKGROUND, (self.timer_rect.x, self.timer_rect.y), self.timer_rect)
+        timer_surf = self.display_font.render(str((WIN_TIME - self.loop_count) // FRAME_RATE), True, WHITE)
+        self.timer_rect = timer_surf.get_rect()
+        self.timer_rect.x = WINDOW_WIDTH - 250
+        self.timer_rect.y = WINDOW_HEIGHT - 50
+        game_window.blit(timer_surf, self.timer_rect)
+                
     def update(self, game_window):
         self.loop_count += 1
         self.increment_bucks()
@@ -160,13 +160,31 @@ class PlayTile(BackgroundTile):
             self.trap = trap
             if trap == EARN:
                 counters.buck_booster += 1
-            return None
+        return None
     def draw_trap(self, game_window, trap_applicator):
         if bool(self.trap):
             game_window.blit(self.trap.trap_img, (self.rect.x, self.rect.y))
+            
+class ButtonTile(BackgroundTile):
+    def set_trap(self, trap, counters):
+        if counters,pizza_bucks >= self.trap.cost:
+            return self.trap
+        else:
+            return None
+    def draw_trap(self, game_window, trap_applicator):
+        if bool(trap_applicator.selected):
+            if trap_applicator.selected == self.trap:
+                draw.rect(game_window, (238,190, 47), (self.rect.x, self.rect.y, WIDTH, HEIGHT), 5)
+
+class InactiveTile(BackgroundTile):
+    def set_trap(self, trap, counters):
+        return None
+    def draw_trap(self, game_window, trap_applicator):
+        pass
+
 
 all_vampires = sprite.Group()
-counters = Counters(STARTING_BUCKS, BUCK_RATE, STARTING_BUCK_BOOSTER)
+counters = Counters(STARTING_BUCKS, BUCK_RATE, STARTING_BUCK_BOOSTER, WIN_TIME)
 
 SLOW = Trap('SLOW', 5, GARLIC)
 DAMAGE = Trap('Damage', 3, CUTTER)
@@ -178,30 +196,42 @@ trap_applicator = TrapApplicator()
 
 tile_grid = []
 tile_color = WHITE
-for row in range(6):
-    
+for row in range(6):    
     row_of_tiles = []
     tile_grid.append(row_of_tiles)
     for column in range(11):
         tile_rect = Rect(WIDTH * column, HEIGHT * row, WIDTH, HEIGHT)
-        new_tile = BackgroundTile(tile_rect)
-        row_of_tiles.append(new_tile)
+        if column <- 1:
+            new_tile = InactiveTile(tile_rect)
+            else:
+                if row == 5:
+                    if 2 <= column <= 4:
+                        new_tile = ButtonTile(tile_rect)
+                        new_tile.trap = [SLOW, DAMAGE, EARN][column - 2]
+                    else:
+                        new_tile = PlayTile(tile_rect)
+            if row == 5 and 2 <= column <= 4:
+                BACKGROUND.blit(new_tile.trap.trap_img, (new_tile.rect.x, new_tile.rect.y))
+            if column != 0 and row != 5:
+                if column != 1:
+                    draw.rect(BACKGROUND, tile_color, (WIDTH * column, HEIGHT * row, WIDTH, HEIGHT), 1)
 
 
 
 
-for row in range(6):
-    for column in range(11):
-        draw.rect(BACKGROUND, tile_color, (WIDTH * column, HEIGHT * row, WIDTH, HEIGHT),1)
+#for row in range(6):
+    #for column in range(11):
+        #draw.rect(BACKGROUND, tile_color, (WIDTH * column, HEIGHT * row, WIDTH, HEIGHT),1)
       
 GAME_WINDOW.blit(BACKGROUND, (0,0))
 game_running = True
+program_running = True
 
 while game_running:
     for event in pygame.event.get():
         if event.type == QUIT:
             game_running = False
-
+            program_running = False
         elif event.type == MOUSEBUTTONDOWN:
             coordinates = mouse.get_pos()
             x = coordinates[0]
