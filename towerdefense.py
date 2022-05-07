@@ -208,6 +208,8 @@ for row in range(6):
                 if 2 <= column <= 4:
                     new_tile = ButtonTile(tile_rect)
                     new_tile.trap = [SLOW, DAMAGE, EARN][column - 2]
+                else:
+                    new_tile = InactiveTile(tile_rect)
             else:
                 new_tile = PlayTile(tile_rect)
                 if row == 5 and 2 <= column <= 4:
