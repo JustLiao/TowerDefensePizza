@@ -212,11 +212,12 @@ for row in range(6):
                     new_tile = InactiveTile(tile_rect)
             else:
                 new_tile = PlayTile(tile_rect)
-                if row == 5 and 2 <= column <= 4:
-                    BACKGROUND.blit(new_tile.trap.trap_img, (new_tile.rect.x, new_tile.rect.y))
-                    if column != 0 and row != 5:
-                        if column != 1:
-                            draw.rect(BACKGROUND, tile_color, (WIDTH * column, HEIGHT * row, WIDTH, HEIGHT), 1)
+        row_of_tiles.append(new_tile)
+        if row == 5 and 2 <= column <= 4:
+            BACKGROUND.blit(new_tile.trap.trap_img, (new_tile.rect.x, new_tile.rect.y))
+        if column != 0 and row != 5:
+            if column != 1:
+                draw.rect(BACKGROUND, tile_color, (WIDTH * column, HEIGHT * row, WIDTH, HEIGHT), 1)
 
 
 
@@ -246,6 +247,11 @@ while game_running:
     if randint(1, SPAWN_RATE) == 1:
         VampireSprite()
 
+    for tile_row in tile_grid:
+        for tile in tile_row:
+            if bool(tile.trap):
+                GAME_WINDOW.blit(BACKGROUND, (tile.rect.x, tile.rect.y), tile.rect)
+
     for vampire in all_vampires:
         tile_row = tile_grid[vampire.rect.y // 100]
         vamp_left_side = vampire.rect.x // 100
@@ -258,20 +264,43 @@ while game_running:
             right_tile = tile_row[vamp_right_side]
         else:
             right_tile = None
-        if bool(left_tile) and left_tile.effect:
+        if bool(left_tile):
             vampire.speed = SLOW_SPEED
         if bool(right_tile) and right_tile.effect:
             if right_tile != left_tile:
-                vampire.speed = SLOW_SPEED
-                if vampire.rect.x <= 0:
-                    vampire.kill()
+                vampire.attack(right_tile)
 
+        if counters.bad_reviews >= MAX_BAD_REVIEWS:
+            game_runniing = False
+        if counters.loop_count > WIN_TIME:
+            game_running = False
 
+    for vampire in all vampires:
+        vampire.update(GAME_WINDOW, counters)
 
-        
-        vampire.update(GAME_WINDOW)
+    for tile_row in tile_grid:
+        for tile in tile_row:
+            tile.draw_trap(GAME_WINDOW, trap_applicator)
 
+    counters.update(GAME_WINDOW)
     display.update()
+    clock.tick(FRAME_RATE)                    
+    display.update()
+    clock.tick(FRAME_RATE)
+
+end_font = font.Font('pizza_font.ttf', 50)
+if program_running:
+    if counters.bad_reviews >= MAX_BAD_REVIEWS:
+        end_surf = end_font.render('Game Over', True, WHITE)
+    else:
+        end_surf = end_font.render('You Win!', True, WHITE)
+        GAME_WINDOW.blit(end_surf, (350,200))
+        display.update
+
+while program_running:
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            program_running - False
     clock.tick(FRAME_RATE)
 
 pygame.quit()
