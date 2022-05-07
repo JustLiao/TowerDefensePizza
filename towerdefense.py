@@ -167,7 +167,7 @@ class PlayTile(BackgroundTile):
             
 class ButtonTile(BackgroundTile):
     def set_trap(self, trap, counters):
-        if counters,pizza_bucks >= self.trap.cost:
+        if counters.pizza_bucks >= self.trap.cost:
             return self.trap
         else:
             return None
@@ -201,20 +201,20 @@ for row in range(6):
     tile_grid.append(row_of_tiles)
     for column in range(11):
         tile_rect = Rect(WIDTH * column, HEIGHT * row, WIDTH, HEIGHT)
-        if column <- 1:
+        if column <= 1:
             new_tile = InactiveTile(tile_rect)
+        else:
+            if row == 5:
+                if 2 <= column <= 4:
+                    new_tile = ButtonTile(tile_rect)
+                    new_tile.trap = [SLOW, DAMAGE, EARN][column - 2]
             else:
-                if row == 5:
-                    if 2 <= column <= 4:
-                        new_tile = ButtonTile(tile_rect)
-                        new_tile.trap = [SLOW, DAMAGE, EARN][column - 2]
-                    else:
-                        new_tile = PlayTile(tile_rect)
-            if row == 5 and 2 <= column <= 4:
-                BACKGROUND.blit(new_tile.trap.trap_img, (new_tile.rect.x, new_tile.rect.y))
-            if column != 0 and row != 5:
-                if column != 1:
-                    draw.rect(BACKGROUND, tile_color, (WIDTH * column, HEIGHT * row, WIDTH, HEIGHT), 1)
+                new_tile = PlayTile(tile_rect)
+                if row == 5 and 2 <= column <= 4:
+                    BACKGROUND.blit(new_tile.trap.trap_img, (new_tile.rect.x, new_tile.rect.y))
+                    if column != 0 and row != 5:
+                        if column != 1:
+                            draw.rect(BACKGROUND, tile_color, (WIDTH * column, HEIGHT * row, WIDTH, HEIGHT), 1)
 
 
 
@@ -239,7 +239,7 @@ while game_running:
 
             tile_y = y // 100
             tile_x = x // 100
-            trap_applicator.select_tile(tile_grid[tile_y[[tile_x], counters]])
+            trap_applicator.select_tile(tile_grid[tile_y][tile_x], counters)
 
     if randint(1, SPAWN_RATE) == 1:
         VampireSprite()
